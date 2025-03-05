@@ -1,4 +1,6 @@
 import random
+import time
+
 import matplotlib.pyplot as plt
 import networkx as nx
 
@@ -18,7 +20,7 @@ class Grid:
                     self.grid[i][j] = True
                     self.graph.remove_node((i, j))
     
-    def visualize_grid(self):
+    def visualize_grid(self, wait_time=None):
         plt.figure(figsize=(10, 10))
         for i in range(self.n):
             for j in range(self.m):
@@ -27,9 +29,14 @@ class Grid:
         plt.xlim(0, self.m)
         plt.ylim(0, self.n)
         plt.gca().set_aspect('equal', adjustable='box')
-        plt.show()
+        if wait_time is not None:
+            plt.show(block=False)
+            time.sleep(wait_time)
+            plt.close()
+        else:
+          plt.show()
     
-    def visualize_grid_with_colors(self, colored_cells):
+    def visualize_grid_with_colors(self, colored_cells, wait_time=None):
         plt.figure(figsize=(10, 10))
         for i in range(self.n):
             for j in range(self.m):
@@ -42,7 +49,13 @@ class Grid:
         plt.xlim(0, self.m)
         plt.ylim(0, self.n)
         plt.gca().set_aspect('equal', adjustable='box')
-        plt.show()
+        if wait_time is not None:
+            plt.show(block=False)
+            plt.pause(wait_time)
+            # time.sleep(wait_time)
+            plt.close()
+        else:
+          plt.show()
     
     def shortest_path(self, start, end):
         try:
