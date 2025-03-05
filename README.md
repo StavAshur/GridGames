@@ -1,8 +1,6 @@
-Sure! Here's a detailed README file to help a 12-year-old with an Apple laptop get the simulation running:
-
 # Grid and Agent Simulation
 
-This repository contains a Python simulation of a grid with agents that move according to different strategies. Follow the instructions below to set up and run the simulation on your Apple laptop.
+This repository contains a Python simulation of a grid with agents that move according to different strategies.
 
 ## Prerequisites
 
