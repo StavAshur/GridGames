@@ -106,5 +106,3 @@ If you get an error saying `python3: command not found`, make sure you have inst
 
 You should now have the simulation running on your Apple laptop. If you encounter any issues or have any questions, feel free to ask for help. Enjoy the simulation!
 ```
-
-Feel free to customize the README file as needed. If you have any questions or need further assistance, let me know!
