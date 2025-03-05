@@ -31,7 +31,7 @@ class Grid:
         plt.gca().set_aspect('equal', adjustable='box')
         if wait_time is not None:
             plt.show(block=False)
-            time.sleep(wait_time)
+            #time.sleep(wait_time)
             plt.close()
         else:
           plt.show()
@@ -51,7 +51,7 @@ class Grid:
         plt.gca().set_aspect('equal', adjustable='box')
         if wait_time is not None:
             plt.show(block=False)
-            plt.pause(wait_time)
+            #plt.pause(wait_time)
             # time.sleep(wait_time)
             plt.close()
         else:
@@ -85,6 +85,11 @@ def shortest_path_strategy(grid, start, goal):
     if path and len(path) > 1:
         return path[1]
     return start
+
+def avoid_other_agents(grid, start, agents_positions):
+    # Write code here
+
+
 
 # Example usage:
 # grid = Grid(5)
