@@ -1,6 +1,5 @@
 Sure! Here's a detailed README file to help a 12-year-old with an Apple laptop get the simulation running:
 
-```markdown
 # Grid and Agent Simulation
 
 This repository contains a Python simulation of a grid with agents that move according to different strategies. Follow the instructions below to set up and run the simulation on your Apple laptop.
@@ -26,7 +25,6 @@ pip is usually installed with Python by default. To check if pip is installed, o
 
 ```sh
 pip --version
-```
 
 If you see a version number, pip is installed. If not, follow these steps:
 
