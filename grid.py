@@ -1,8 +1,11 @@
 import random
-import time
+import math
 
 import matplotlib.pyplot as plt
 import networkx as nx
+
+def dist(start, end):
+    return math.sqrt((start[0]-end[0])*(start[0]-end[0])+(start[1]-end[1])*(start[1]-end[1]))
 
 class Grid:
     def __init__(self, n, m=None):
@@ -87,7 +90,36 @@ def shortest_path_strategy(grid, start, goal):
     return start
 
 def avoid_other_agents(grid, start, agents_positions):
-    # Write code here
+    possibleTargets = [(0,0), (grid.n-1,0), (grid.n-1, grid.m-1), (0, grid.m-1)]
+    best = 0
+    bestDistance = 0
+    for agent in agents_positions:
+        bestDistance += grid.shortest_path(agent, possibleTargets[best])[1]
+        #bestDistance += dist(start, agent)
+        try:
+            nextStep = grid.shortest_path(start, possibleTargets[best])[0][1]
+            bestDistance *= dist(nextStep, agent)**2
+        except:
+            pass
+    for i in range(len(possibleTargets)):
+        target = possibleTargets[i]
+        distance = 0
+        for agent in agents_positions:
+            distance += grid.shortest_path(agent, target)[1]
+            #distance += dist(target, agent)
+            try:
+                nextStep = grid.shortest_path(start, target)[0][1]
+                distance *= dist(nextStep, agent)**2
+            except:
+                pass
+        if(distance > bestDistance):
+            best = i
+            bestDistance = distance
+    path = grid.shortest_path(start, possibleTargets[best])[0]
+    if path and len(path) > 1:
+        return path[1]
+    return start
+    
 
 
 
