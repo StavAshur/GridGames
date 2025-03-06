@@ -74,23 +74,30 @@ class Agent:
         self.y = y
         self.color = color
         self.strategy = strategy
+        self.target = (None,None)
 
 def random_walk_strategy(grid, x, y):
     neighbors = list(grid.graph.neighbors((x, y)))
     if neighbors:
-        return random.choice(neighbors)
-    return (x, y)
+        return (random.choice(neighbors), (None,None))
+    return ((x, y), (None,None))
 
 def shortest_path_strategy(grid, start, goal):
     if start == goal:
-        return start
+        return (start, start)
     path, _ = grid.shortest_path(start, goal)
     if path and len(path) > 1:
-        return path[1]
-    return start
+        return (path[1], goal)
+    return (start, start)
 
 def avoid_other_agents(grid, start, agents_positions):
-    possibleTargets = [(0,0), (grid.n-1,0), (grid.n-1, grid.m-1), (0, grid.m-1)]
+    #Strategy:
+    #Iterate over all enemies
+    #Calculate path length from enemy to each corner (can be changed form corner to something else in possibleTargets)
+    #Multiply that path length by the square of the exact distance 
+    #from the first step along the path to that corner to the enemy
+    #Navigate towards corner with the best score by this method
+    possibleTargets = [(0,0), (grid.n-1,0), (grid.n-1, grid.m-1), (0, grid.m-1), (round(grid.n/2), round(grid.m/2))]
     best = 0
     bestDistance = 0
     for agent in agents_positions:
@@ -98,7 +105,7 @@ def avoid_other_agents(grid, start, agents_positions):
         #bestDistance += dist(start, agent)
         try:
             nextStep = grid.shortest_path(start, possibleTargets[best])[0][1]
-            bestDistance *= dist(nextStep, agent)**2
+            bestDistance *= dist(nextStep, agent)**3
         except:
             pass
     for i in range(len(possibleTargets)):
@@ -106,10 +113,10 @@ def avoid_other_agents(grid, start, agents_positions):
         distance = 0
         for agent in agents_positions:
             distance += grid.shortest_path(agent, target)[1]
-            #distance += dist(target, agent)
+            distance += dist(target, agent)
             try:
                 nextStep = grid.shortest_path(start, target)[0][1]
-                distance *= dist(nextStep, agent)**2
+                distance *= dist(nextStep, agent)**3
             except:
                 pass
         if(distance > bestDistance):
@@ -117,8 +124,8 @@ def avoid_other_agents(grid, start, agents_positions):
             bestDistance = distance
     path = grid.shortest_path(start, possibleTargets[best])[0]
     if path and len(path) > 1:
-        return path[1]
-    return start
+        return (path[1], possibleTargets[best])
+    return (start, start)
     
 
 

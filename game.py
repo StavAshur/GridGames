@@ -1,4 +1,3 @@
-import time
 import random
 import matplotlib.pyplot as plt
 from grid import Grid, Agent, random_walk_strategy
@@ -39,11 +38,12 @@ def run_simulation():
 
         # Display the plot
         plt.show(block=False)
-        plt.pause(0.3)
+        plt.pause(0.1)
 
         # Move agents according to their strategy
-        new_pos1 = agent1.strategy(grid, agent1.x, agent1.y)
-        new_pos2 = agent2.strategy(grid, agent2.x, agent2.y)
+        new_pos1 = agent1.strategy(grid, agent1.x, agent1.y)[0]
+        new_pos2 = agent2.strategy(grid, agent2.x, agent2.y)[0]
+
 
         agent1.x, agent1.y = new_pos1
         agent2.x, agent2.y = new_pos2
