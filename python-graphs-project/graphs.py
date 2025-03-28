@@ -1,4 +1,5 @@
 from math import ceil, floor
+from copy import deepcopy
 class Queue:
     def __init__(self, nodes=None):
         try:
@@ -67,7 +68,7 @@ def table_to_str(table):
 
 
     for rowKey in table:
-        output = f"{output}{rowKey}|"
+        output = f"{output}{rowKey}{' '*(colKeyWidth-len(str(rowKey)))}|"
         for key in table[rowKey]:
             value = table[rowKey][key]
             if not key in colKeys: colKeys.append(key)
@@ -94,7 +95,7 @@ class Graph:
     def __init__(self):
         self.nodes = set()
         self.adjacency_list = {}
-        self.neighbor_matrix = {}
+        self.adjacency_matrix = {}
         #Basic algorithm safety precautions (joke)
         self._cost_of_becoming_skynet = 9999999.9
         self._cost_of_harming_humans = 9999999.9
@@ -108,49 +109,52 @@ class Graph:
 Adjacency list:
 {two_value_table_to_str(self.adjacency_list)}
 Adjacency matrix:
-{table_to_str(self.neighbor_matrix)}"""
+{table_to_str(self.adjacency_matrix)}"""
 
     def add_node(self, new_node):
         self.nodes.add(new_node)
         self.adjacency_list.update({new_node:[]})
-        self.neighbor_matrix.update({new_node:{}})
-        for existing_node in self.neighbor_matrix:
-            self.neighbor_matrix[existing_node].update({new_node:0})
-            self.neighbor_matrix[new_node].update({existing_node:0})
+        self.adjacency_matrix.update({new_node:{}})
+        for existing_node in self.adjacency_matrix:
+            self.adjacency_matrix[existing_node].update({new_node:0})
+            self.adjacency_matrix[new_node].update({existing_node:0})
 
     def remove_node(self, node):
         self.nodes.remove(node)
         for n in self.get_neighbors(node): self.remove_edge(node, n)
         self.adjacency_list.pop(node, None)
-        self.neighbor_matrix.pop(node, None)
-        for existing_node in self.neighbor_matrix:
-            self.neighbor_matrix[existing_node].pop(node, None)
+        self.adjacency_matrix.pop(node, None)
+        for existing_node in self.adjacency_matrix:
+            self.adjacency_matrix[existing_node].pop(node, None)
 
     def add_edge(self, node1, node2, weight=1.0, directional=False):
         self.adjacency_list[node1].append(node2)
         self.adjacency_list[node2].append(node1)
-        self.neighbor_matrix[node1][node2] = weight
+        self.adjacency_matrix[node1][node2] = weight
         if not directional:
-            self.neighbor_matrix[node2][node1] = weight
+            self.adjacency_matrix[node2][node1] = weight
 
     def remove_edge(self, node1, node2):
         self.adjacency_list[node1].remove(node2)
         self.adjacency_list[node2].remove(node1)
-        self.neighbor_matrix[node1][node2] = 0
-        self.neighbor_matrix[node2][node1] = 0
+        self.adjacency_matrix[node1][node2] = 0
+        self.adjacency_matrix[node2][node1] = 0
 
     def get_neighbors(self, node, use_adjacency_list=True):
         if use_adjacency_list: 
             return self.adjacency_list[node]
-        return [other for other in self.neighbor_matrix if self.neighbor_matrix[node][other] != 0]
+        return [other for other in self.adjacency_matrix if self.adjacency_matrix[node][other] != 0]
         
     def has_edge(self, node1, node2, use_adjacency_list=True):
-        if use_adjacency_list:
-            return node2 in self.adjacency_list[node1]
-        return self.neighbor_matrix[node1][node2] != 0
+        try:
+            if use_adjacency_list:
+                return node2 in self.adjacency_list[node1]
+            return self.adjacency_matrix[node1][node2] != 0
+        except KeyError:
+            return False
 
     def get_edge_weight(self, node1, node2):
-        return self.neighbor_matrix[node1][node2] if self.neighbor_matrix[node1][node2] != 0 else None
+        return self.adjacency_matrix[node1][node2] if self.adjacency_matrix[node1][node2] != 0 else None
 
     def get_path_cost(self, path):
         path_cost = 0
@@ -170,25 +174,57 @@ Adjacency matrix:
         cost_of_becoming_skynet = 9999999.9
         cost_of_harming_humans = 9999999.9
         cost_of_destroying_world = float('inf')
-        frontier = Queue([start_node])
-        explored = Queue()
-        failures = []
+        
+        #frontier = Queue([start_node])
+        frontier = {start_node: 0}
+        explored = {}
         while not end_node in list(explored) and len(frontier) > 0:
-            explored.add(frontier.get())
-            #Add new nodes and store them in one line via list comprehension!
-            new=[frontier.add(neighbor) for neighbor in self.get_neighbors(frontier.get(),use_adjacency_list) if not explored.has(neighbor)]
-            #Keep track of failed paths
-            if(len(new) == 0 and not end_node in explored):
-                failures.append(frontier.get())
+            node = list(frontier.keys())[0]
+            explored.update({node:frontier[node]})
+            [frontier.update(
+                {n:frontier[node]+1}
+                ) for n in self.get_neighbors(node,use_adjacency_list) if not n in explored.keys()]
             #Remove the node
-            frontier.pop()
+            frontier.pop(node)
         #If no goal provided, return everything explored
         if not end_node:
             return explored
-        if len(frontier) == 0:
+        if len(frontier) == 0 and end_node not in list(explored.keys()):
             raise noPathError(self, start_node, end_node)
-        
-        #Take the explored and find the path to the goal (NYI)
+        #Try to return path
+        pathish=[[key for key in list(explored.keys()) if explored[key] == i] for i in range(sorted(explored.values())[-1]+1)]
+        pathish = sorted([key for key in list(explored.keys())], reverse=True, 
+                         key=lambda x: explored[x] + 1000000000 if x == end_node else explored[x])
+        path = []
+        for i in range(len(pathish)):
+            try:
+                path.append(pathish[i]) if(i == 0 or self.has_edge(path[i-1], pathish[i])) else path.append(path[-1])
+            except IndexError:
+                path.append(path[-1])
+        finalpath = []
+        [finalpath.append(node) for node in path if node not in finalpath]
+        finalpath = [finalpath[0]] + [finalpath[i] for i in range(len(finalpath)) if self.has_edge(finalpath[i], finalpath[i-1])]
+        r = range(len(finalpath))
+
+        for i in r:
+            if i not in r: break
+            for j in r:
+                if j not in r: break
+                #print(i, j)
+                #print(list(r))
+                if(self.has_edge(finalpath[i], finalpath[j]) and (i-j)**2 > 1):
+                    if i < j:
+                        m = i
+                        n = j
+                    else: 
+                        m = j
+                        n = i
+                    finalpath = [k for k in finalpath if k not in finalpath[m+1:n]]
+                    r = range(len(finalpath))
+                    #print(finalpath[i], "-", finalpath[j])
+        path = finalpath
+        path.reverse()
+        return path
         raise NotImplementedError("Cannot return the path yet lol")
 
 
@@ -209,14 +245,18 @@ if __name__ == "__main__":
     g.add_node("e")
     g.add_node(1)
     g.add_node("1")
+    g.add_node("okay")
     print(g.adjacency_list)
-    print(g.neighbor_matrix)
+    print(g.adjacency_matrix)
     g.add_edge("a", "b")
     g.add_edge("b", "c")
     g.add_edge("e", "d")
+    g.add_edge("e", "okay", 5)
+    g.add_edge("e", 1)
+    g.add_edge("okay", "1")
     print(g.adjacency_list)
-    print(table_to_str(g.neighbor_matrix))
+    print(table_to_str(g.adjacency_matrix))
     print(g.connected_components())
-    print(g.bfs("e", "a"))
+    print(g.bfs("d", "okay"))
     
 
