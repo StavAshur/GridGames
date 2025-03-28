@@ -20,7 +20,8 @@ def main():
         "Irving, TX", "Gilbert, AZ", "Birmingham, AL", "Richmond, VA", "Boise, ID",
         "San Bernardino, CA", "Spokane, WA", "Des Moines, IA", "Modesto, CA", "Fremont, CA",
         "Santa Rosa, CA", "Montgomery, AL", "Augusta, GA", "Akron, OH", "Little Rock, AR",
-        "Colontown, TX", "Springfield, IL", "Memphis, TN", "Peoria, IL", "Huntington Beach, CA", "Grand Rapids, MI", "Salt Lake City, UT", "Tallahassee, FL"
+        "Colontown, TX", "Springfield, IL", "Memphis, TN", "Peoria, IL", "Huntington Beach, CA", 
+        "Grand Rapids, MI", "Salt Lake City, UT", "Tallahassee, FL", "New Haven, CT"
     ]
 
     distances = {
@@ -39,6 +40,7 @@ def main():
         ("New York, NY", "Dallas, TX"): 1548,
         ("New York, NY", "San Jose, CA"): 2904,
         ("New York, NY", "Austin, TX"): 1745,
+        ("New York, NY", "New Haven, CT"): 85,
         ("Los Angeles, CA", "Chicago, IL"): 2015,
         ("Los Angeles, CA", "Houston, TX"): 1547,
         ("Los Angeles, CA", "Phoenix, AZ"): 373,
@@ -266,7 +268,7 @@ def main():
     }
 
     # Example of how to use the Graph class
-    from graphs_full import Graph
+    from graphs import Graph, noPathError
 
     graph = Graph()
     for city in cities:
@@ -276,9 +278,16 @@ def main():
         graph.add_edge(city1, city2, distance)
 
     # Example usage of graph methods
-    print("Neighbors of Champaign, IL:", graph.get_neighbors("Champaign, IL"))
-    print("Edge exists between Champaign, IL and Chicago, IL:", graph.has_edge("Champaign, IL", "Chicago, IL"))
-    print("Distance between Champaign, IL and Chicago, IL:", graph.get_edge_weight("Champaign, IL", "Chicago, IL"))
-
+    city1 = "Champaign, IL"
+    city2 = "Colorado Springs, CO"
+    print(f"Neighbors of {city1}:", graph.get_neighbors(city1))
+    #print("Edge exists between Champaign, IL and Chicago, IL:", graph.has_edge("Champaign, IL", "Chicago, IL"))
+    #print("Distance between Champaign, IL and Chicago, IL:", graph.get_edge_weight("Champaign, IL", "Chicago, IL"))
+    #print(f"All places that can be reached from {city1}: {graph.bfs(city1)}")
+    if(city2 not in graph.bfs(city1)):
+        print(f"No path between {city1} and {city2}")
+    print(f"Route from {city1} to {city2}: {graph.bfs(city1, city2)}")
+    print(graph.get_path_cost(graph.bfs(city1, city2)))
+    
 if __name__ == "__main__":
     main()
