@@ -48,7 +48,7 @@ def main():
     size = 50
     wallChance = 30
     #Actual agent width is twice this plus one
-    agentSize = 2
+    agentSize = 1
     g = nx.Graph()
     [[g.add_node((i, j, False)) if randrange(wallChance) < 1 else g.add_node((i, j, True)) for j in range(size)] for i in range(size)]
     g2 = nx.grid_2d_graph(size, size)
