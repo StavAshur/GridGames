@@ -46,7 +46,9 @@ def neighborhood(pos, size = 1):
 
 def main():
     size = 50
-    wallChance = 10
+    wallChance = 30
+    #Actual agent width is twice this plus one
+    agentSize = 2
     g = nx.Graph()
     [[g.add_node((i, j, False)) if randrange(wallChance) < 1 else g.add_node((i, j, True)) for j in range(size)] for i in range(size)]
     g2 = nx.grid_2d_graph(size, size)
@@ -57,6 +59,7 @@ def main():
     for hole in holes(g):
         width = len(convert_grid(g)[0])
         height= len(convert_grid(g))
+        """
         if(hole[1]+1 < height):
             walls.append((hole[0]-1, hole[1]+1))
             walls.append((hole[0]+1, hole[1]+1))
@@ -67,24 +70,26 @@ def main():
             walls.append((hole[0], hole[1]-1))
         walls.append((hole[0]-1, hole[1]))
         walls.append((hole[0]+1, hole[1]))
+        """
+        [walls.append(wall) if(-1 < wall[0] < width and -1 < wall[1] < height) else None for wall in neighborhood(hole, agentSize)]
     
     display_grid = deepcopy(g)
     nodes = [node for node in g.nodes.keys()]
     ball = choice(nodes)
     [g.remove_node(node) if node in walls else None for node in nodes]
     nodes = [node for node in g.nodes.keys()]
-    #print_grid(g, {ball:"b"})
-    #print(ball)
     agent = choice(nodes)
-    targets = neighborhood(ball, 2)
-
+    targets = neighborhood(ball, agentSize+1)
+    #print_grid(g, {ball:"🟥", agent:"🟦"})
+    #print(ball)
+       
     target = ball
     while target not in g.nodes:
         try:
             target = targets.pop()
         except IndexError:
             ball = choice(list(display_grid.nodes.keys()))
-            targets = neighborhood(ball, 2)
+            targets = neighborhood(ball, agentSize+1)
             target = ball
             
     try:
@@ -92,7 +97,7 @@ def main():
             print()
             agent = nx.shortest_path(g, agent, target)[1]
             display_specials = {ball:"🟥"}
-            [display_specials.update({pos: "🟦"}) for pos in neighborhood(agent, 1)]
+            [display_specials.update({pos: "🟦"}) for pos in neighborhood(agent, agentSize)]
             """print_grid(display_grid, {
                 ball:"🟥", 
                 agent:"🟦",
