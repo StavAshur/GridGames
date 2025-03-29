@@ -46,7 +46,7 @@ def neighborhood(pos, size = 1):
 
 def main():
     size = 50
-    wallChance = 30
+    wallChance = 10
     #Actual agent width is twice this plus one
     agentSize = 1
     g = nx.Graph()
