@@ -29,7 +29,7 @@ class noPathError(Exception):
         self.node2 = node2
         super().__init__(self.message)
     def __str__(self):
-        return f"No path between {self.node1} and {self.node2} in the following graph:\n{str(self.graph)} ({self.message})"
+        return f"No path between {self.node1} and {self.node2} in the graph: ({self.message})"
 
 def strWidth(str):
     output = 0

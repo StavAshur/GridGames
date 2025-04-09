@@ -279,15 +279,20 @@ def main():
 
     # Example usage of graph methods
     city1 = "Champaign, IL"
-    city2 = "Colorado Springs, CO"
+    city2 = "Arlington, TX"
+    print()
     print(f"Neighbors of {city1}:", graph.get_neighbors(city1))
+    print()
     #print("Edge exists between Champaign, IL and Chicago, IL:", graph.has_edge("Champaign, IL", "Chicago, IL"))
     #print("Distance between Champaign, IL and Chicago, IL:", graph.get_edge_weight("Champaign, IL", "Chicago, IL"))
     #print(f"All places that can be reached from {city1}: {graph.bfs(city1)}")
     if(city2 not in graph.bfs(city1)):
         print(f"No path between {city1} and {city2}")
     print(f"Route from {city1} to {city2}: {graph.bfs(city1, city2)}")
-    print(graph.get_path_cost(graph.bfs(city1, city2)))
+    print()
+    print("Route length: ", graph.get_path_cost(graph.bfs(city1, city2)), "mi")
+    print(graph.adjacency_list)
+    print()
     
 if __name__ == "__main__":
     main()
