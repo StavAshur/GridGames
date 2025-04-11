@@ -183,5 +183,5 @@ def main():
     g = connect_components(g, components)
     display(g, start, end)
     
-    
-main()
+if __name__ == "__main__":
+    main()

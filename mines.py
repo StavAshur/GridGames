@@ -1,6 +1,7 @@
 import random
 import matplotlib.pyplot as plt
 import networkx as nx
+from time import sleep
 
 # Step 1: Generate a 100x100 grid
 grid_size = 20
@@ -33,18 +34,27 @@ for i in range(grid_size):
                 if not adjacent_mines:
                     grid[i][j] = 2  # 2 represents a mine
 
+#Step 5: Make agent, goal
+agent = (0, 0)
+goal = (grid_size-1, grid_size-1)
 # Display the grid with obstacles and mines
-plt.figure(figsize=(10, 10))
-for i in range(grid_size):
-    for j in range(grid_size):
-        if grid[i][j] == 1:
-            color = 'black'  # Obstacle
-        elif grid[i][j] == 2:
-            color = 'red'  # Mine
-        else:
-            color = 'white'  # Free cell
-        plt.gca().add_patch(plt.Rectangle((j, grid_size - i - 1), 1, 1, edgecolor='black', facecolor=color))
-plt.xlim(0, grid_size)
-plt.ylim(0, grid_size)
-plt.gca().set_aspect('equal', adjustable='box')
-plt.show()
+while True:
+    plt.figure(figsize=(10, 10))
+    for i in range(grid_size):
+        for j in range(grid_size):
+            if grid[i][j] == 1:
+                color = 'black'  # Obstacle
+            elif grid[i][j] == 2:
+                color = 'red'  # Mine
+            else:
+                color = 'white'  # Free cell
+            if(i == agent[1] and j == agent[0]):
+                color = 'blue'
+            if(i == goal[1] and j == goal[0]):
+                color = 'green'
+            plt.gca().add_patch(plt.Rectangle((j, grid_size - i - 1), 1, 1, edgecolor='black', facecolor=color))
+    plt.xlim(0, grid_size)
+    plt.ylim(0, grid_size)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.show()
+    sleep(0.1)
