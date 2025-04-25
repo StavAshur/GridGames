@@ -40,9 +40,11 @@ def print_grid(g, specials = {}, width = None, height = None):
     print(output)
     return output
 
-def neighborhood(pos, size = 1):
+def neighborhood(pos, size = 1, include_original = False):
     output = []
     [[output.append((pos[0]+i, pos[1]+j)) for j in range(-size, size+1)] for i in range(-size, size+1)]
+    if not include_original:
+        output.remove(pos)
     return output
 
 def main():
@@ -126,20 +128,20 @@ def main():
             display_specials = {dropoff:"🟦", ball:"🟥"}
             [display_specials.update({pos: "🟨"}) for pos in nx.bfs_tree(g, agent)]
             [display_specials.update({pos: "🟩"}) for pos in path[path.index(node): len(path)-1]]
-            [display_specials.update({pos: "🟦"}) for pos in neighborhood(agent, agentSize)]
+            [display_specials.update({pos: "🟦"}) for pos in neighborhood(agent, agentSize, True)]
             display_specials.update({dropoff:"🟦", ball:"🟥"})
             #print()
             print_grid(display_grid, display_specials)
             sleep(0.01)
         target = dropoff
-        targets=[dropoff, (dropoff[0]-2, dropoff[1]), (dropoff[0]+2, dropoff[1]), (dropoff[0], dropoff[1]+2), (dropoff[0], dropoff[1]-2)]
+        targets=[(dropoff[0]-2, dropoff[1]), (dropoff[0]+2, dropoff[1]), (dropoff[0], dropoff[1]+2), (dropoff[0], dropoff[1]-2)]
         while target not in g.nodes:
             try:
                 target = targets.pop()
             except IndexError:
-                ball = choice(list(display_grid.nodes.keys()))
-                targets = neighborhood(ball, agentSize+1)
-                target = ball
+                dropoff = choice(list(display_grid.nodes.keys()))
+                targets=[(dropoff[0]-2, dropoff[1]),(dropoff[0]+2, dropoff[1]),(dropoff[0], dropoff[1]+2),(dropoff[0], dropoff[1]-2)]
+                target = dropoff
         path = nx.shortest_path(g, agent, target)
         for node in path:
             #agent = nx.shortest_path(g, agent, target)[1]
@@ -148,7 +150,7 @@ def main():
             display_specials = {dropoff:"🟦", ball:"🟥"}
             [display_specials.update({pos: "🟨"}) for pos in nx.bfs_tree(g, agent)]
             [display_specials.update({pos: "🟩"}) for pos in path[path.index(node): len(path)-1]]
-            [display_specials.update({pos: "🟦"}) for pos in neighborhood(agent, agentSize)]
+            [display_specials.update({pos: "🟦"}) for pos in neighborhood(agent, agentSize, True)]
             display_specials.update({dropoff:"🟦", ball:"🟥"})
             #print()
             print_grid(display_grid, display_specials)
@@ -157,7 +159,7 @@ def main():
         display_specials = {dropoff:"🟦", ball:"🟥"}
         [display_specials.update({pos: "🟨"}) for pos in nx.bfs_tree(g, agent)]
         [display_specials.update({pos: "🟩"}) for pos in path[path.index(node): len(path)-1]]
-        [display_specials.update({pos: "🟦"}) for pos in neighborhood(agent, agentSize)]
+        [display_specials.update({pos: "🟦"}) for pos in neighborhood(agent, agentSize, True)]
         display_specials.update({dropoff:"🟦", ball:"🟥"})
         print_grid(display_grid, display_specials)
         sys.exit()

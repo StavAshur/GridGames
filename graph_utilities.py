@@ -30,3 +30,25 @@ def without(l, e):
     except:
         return l
     return l
+
+def pos_range_without_all(w, h, ignore = []):
+    output = []
+    [[output.append((i, j)) for i in range(w) if (i, j) not in ignore] for j in range(h)]
+    return output
+
+def add_edges_to_graph_from(g, edges, weights=None, nodeNotFoundMode = None):
+    if not weights or len(weights) == 0:
+        for edge in edges:
+            add_edge_to_graph(g, edge[0], edge[1], nodeNotFoundMode)
+    elif type(weights) == dict:
+        for edge in edges:
+            try:
+                add_edge_to_graph(g, edge[0], edge[1], weights[edge], nodeNotFoundMode)
+            except KeyError:
+                add_edge_to_graph(g, edge[0], edge[1], 1, nodeNotFoundMode)
+    else:
+        for i in range(len(edges)):
+            try:
+                add_edge_to_graph(g, edges[i][0], edges[i][1], weights[i], nodeNotFoundMode)
+            except IndexError:
+                add_edge_to_graph(g, edges[i][0], edges[i][1], 1, nodeNotFoundMode)
