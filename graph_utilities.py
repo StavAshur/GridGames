@@ -52,3 +52,28 @@ def add_edges_to_graph_from(g, edges, weights=None, nodeNotFoundMode = None):
                 add_edge_to_graph(g, edges[i][0], edges[i][1], weights[i], nodeNotFoundMode)
             except IndexError:
                 add_edge_to_graph(g, edges[i][0], edges[i][1], 1, nodeNotFoundMode)
+
+def convert_grid(g, width = None, height = None):
+    if not width:
+        width = sorted([node for node in g.nodes.keys()], key = lambda x: x[0])[-1][0] + 1
+    if not height:
+        height= sorted([node for node in g.nodes.keys()], key = lambda x: x[1])[-1][1] + 1
+    grid = [[None for j in range(width)] for i in range(height)]
+    for node in g.nodes:
+        try:
+            grid[node[1]][node[0]] = node
+        except IndexError:
+            pass
+    return grid
+
+def find_all_cycles(g):
+    output = set()
+    for node in g:
+        try:
+            s = set()
+            for edge in nx.find_cycle(g, node):
+                s.add(edge[0])
+            output.add(tuple(s))
+        except nx.NetworkXNoCycle:
+            pass
+    return output
