@@ -6,6 +6,7 @@ import numpy as np
 from PIL import Image
 import networkx as nx
 from random import choice
+from math import ceil
 
 #Literally all I had to do was add .convert("L") and remove the invert
 image = (np.array(Image.open("maze_large.png").convert("L")))
@@ -20,6 +21,7 @@ for i in range(len(skeleton)):
                     g.add_edge((i, j), n)
 print()
 clone = np.array(skeleton)
+clone_2 = np.array(clone)
 allowed_x = set()
 allowed_y = set()
 for node in g:
@@ -54,7 +56,9 @@ for i in range(len(allowed_y)-1):
     avg_dist += allowed_y[i+1]-allowed_y[i]
 
 avg_dist /= len(allowed_x)-1 + len(allowed_y)-1
-print(avg_dist)
+print(f"average step size = {avg_dist}")
+avg_dist = ceil(avg_dist)
+print(f"ceiling: {avg_dist}")
 
 g2 = nx.Graph()
 
@@ -72,7 +76,7 @@ for i in range(len(allowed_x)):
     for j in range(len(allowed_y)):
         try:
             n1, n2 = (allowed_x[i],allowed_y[j]), (allowed_x[i-1],allowed_y[j])
-            if nx.shortest_path_length(g, n1, n2) < avg_dist:
+            if nx.shortest_path_length(g, n1, n2) <= avg_dist:
                 g2.add_edge(n1, n2)
         except IndexError:
             pass
@@ -80,7 +84,7 @@ for i in range(len(allowed_x)):
             pass
         try:
             n1, n2 = (allowed_x[i],allowed_y[j]), (allowed_x[i+1],allowed_y[j])
-            if nx.shortest_path_length(g, n1, n2) < avg_dist:
+            if nx.shortest_path_length(g, n1, n2) <= avg_dist:
                 g2.add_edge(n1, n2)
         except IndexError:
             pass
@@ -88,7 +92,7 @@ for i in range(len(allowed_x)):
             pass
         try:
             n1, n2 = (allowed_x[i],allowed_y[j]), (allowed_x[i],allowed_y[j-1])
-            if nx.shortest_path_length(g, n1, n2) < avg_dist:
+            if nx.shortest_path_length(g, n1, n2) <= avg_dist:
                 g2.add_edge(n1, n2)
         except IndexError:
             pass
@@ -96,7 +100,7 @@ for i in range(len(allowed_x)):
             pass
         try:
             n1, n2 = (allowed_x[i],allowed_y[j]), (allowed_x[i],allowed_y[j+1])
-            if nx.shortest_path_length(g, n1, n2) < avg_dist:
+            if nx.shortest_path_length(g, n1, n2) <= avg_dist:
                 g2.add_edge(n1, n2)
         except IndexError:
             pass
@@ -143,17 +147,37 @@ for node1 in g2:
 
 while True:
     try:
+        n1, n2 = (choice(sorted(list(g2.nodes), key=lambda n: n[0] + n[1])[:100]), 
+                  choice(sorted(list(g2.nodes), key=lambda n: n[0] + n[1], reverse = True)[:100]))
+        print(n1, n2)
+        path_2 = (nx.shortest_path(g2, n1, n2))
+        path = (nx.shortest_path(g, n1, n2))
+        break
+    except nx.NetworkXNoPath:
+        pass
+
+"""while True:
+    try:
         n1, n2 = (choice(sorted(list(g.nodes), key=lambda n: n[0] + n[1])[:100]), 
                   choice(sorted(list(g.nodes), key=lambda n: n[0] + n[1], reverse = True)[:100]))
         print(n1, n2)
         path = (nx.shortest_path(g, n1, n2))
         break
     except nx.NetworkXNoPath:
-        pass
+        pass"""
 
 for node in g:
     if node not in path:
         clone[node[0]][node[1]] = 0
+
+path_2_pixels = []
+
+for i in range(len(path_2)-1):
+    [path_2_pixels.append(node) for node in nx.shortest_path(g, path_2[i], path_2[i+1])]
+
+for node in g:
+    if node not in path_2_pixels:
+        clone_2[node[0]][node[1]] = 0
 
 # display results
 fig, axes = plt.subplots(nrows=1, ncols=4, figsize=(8, 4), sharex=True, sharey=True)
@@ -170,8 +194,11 @@ ax[1].set_title('skeleton', fontsize=20)
 
 ax[2].imshow(invert(clone), cmap=plt.cm.gray)
 ax[2].axis('off')
-ax[2].set_title('path', fontsize=20)
+ax[2].set_title(f'path \n(pixel graph)\n{len(path)} steps', fontsize=15)
 
+ax[3].imshow(invert(clone_2), cmap=plt.cm.gray)
+ax[3].axis('off')
+ax[3].set_title(f'path \n(maze graph)\n{len(path_2)} steps', fontsize=15)
 
 fig.tight_layout()
 plt.show()
